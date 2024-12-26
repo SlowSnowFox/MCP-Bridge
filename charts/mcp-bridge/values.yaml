@@ -1,0 +1,45 @@
+replicaCount: 1
+
+image:
+  repository: slowfox/mcp-bridge
+  pullPolicy: Always
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 8000
+
+config:
+  inferenceServer:
+    baseUrl: ""
+    apiKey: ""
+  mcpServers: {}
+  network:
+    host: "0.0.0.0"
+    port: 9090
+  logging:
+    logLevel: "DEBUG"
+
+# Example of how to add MCP servers
+#   mcpServers:
+#     mcp-k8s:
+#       command: "mcp-k8s"
+#       args: []
+#     fetch:
+#       command: "uvx"
+#       args: ["mcp-server-fetch"]
+#     custom-server:
+#       command: "custom-command"
+#       args: ["arg1", "arg2"]
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+podAnnotations: {}
+
+podLabels: {}
