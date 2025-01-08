@@ -1,6 +1,7 @@
 import json
 from socket import timeout
 from typing import Optional
+from fastapi import HTTPException
 from lmos_openai_types import (
     ChatCompletionMessageToolCall,
     ChatCompletionRequestMessage,
@@ -46,7 +47,7 @@ async def chat_completions(request: CreateChatCompletionRequest):
             exclude_defaults=True, exclude_none=True, exclude_unset=True
         )
 
-        logger.debug(json_data)
+        # logger.debug(json_data)
 
         last: Optional[CreateChatCompletionStreamResponse] = None  # last message
 
@@ -59,6 +60,20 @@ async def chat_completions(request: CreateChatCompletionRequest):
         async with aconnect_sse(
             client, "post", "/chat/completions", content=json_data
         ) as event_source:
+            
+            # check if the content type is correct because the aiter_sse method
+            # will raise an exception if the content type is not correct
+            if "Content-Type" in event_source.response.headers:
+                content_type = event_source.response.headers["Content-Type"]
+                if "text/event-stream" not in content_type:
+                    logger.error(f"Unexpected Content-Type: {content_type}")
+                    error_data = await event_source.response.aread()
+                    logger.debug(f"Request URL: {event_source.response.url}")
+                    logger.debug(f"Response Status: {event_source.response.status_code}")
+                    logger.debug(f"Response Data: {error_data.decode(event_source.response.encoding or 'utf-8')}")
+                    raise HTTPException(status_code=500, detail="Unexpected Content-Type")
+
+            # iterate over the SSE stream
             async for sse in event_source.aiter_sse():
                 event = sse.event
                 data = sse.data
@@ -74,9 +89,19 @@ async def chat_completions(request: CreateChatCompletionRequest):
                     logger.debug("inference serverstream done")
                     break
 
-                parsed_data = CreateChatCompletionStreamResponse.model_validate_json(
-                    data
-                )
+                # for some reason openrouter uses uppercase for finish_reason
+                try:
+                    data['choices'][0]['finish_reason'] = data['choices'][0]['finish_reason'].lower() # type: ignore
+                except Exception as e:
+                    logger.debug(f"failed to lowercase finish_reason: {e}")
+
+                try:
+                    parsed_data = CreateChatCompletionStreamResponse.model_validate_json(
+                        data
+                    )
+                except Exception as e:
+                    logger.debug(data)
+                    raise e
 
                 # add the delta to the response content
                 content = parsed_data.choices[0].delta.content
@@ -136,7 +161,7 @@ async def chat_completions(request: CreateChatCompletionRequest):
             f"{tool_call_name=} {tool_call_json=}"
         )  # this should not be error but its easier to debug
 
-        # add recieved message to the history
+        # add received message to the history
         msg = ChatCompletionRequestMessage(
             role="assistant",
             content=response_content,

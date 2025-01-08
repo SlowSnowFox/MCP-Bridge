@@ -24,11 +24,13 @@ class StdioClient(GenericMcpClient):
             logger.error(f"could not find command {config.command}")
             exit(1)
 
-        self.config = StdioServerParameters(
-            command=command,
-            args=config.args,
-            env=env,
-        )
+        own_config = config.model_copy(deep=True)
+
+        # this changes the default to ignore
+        if "encoding_error_handler" not in config.model_fields_set:
+            own_config.encoding_error_handler = "ignore"
+
+        self.config = own_config
 
     async def _maintain_session(self):
         async with stdio_client(self.config) as client:

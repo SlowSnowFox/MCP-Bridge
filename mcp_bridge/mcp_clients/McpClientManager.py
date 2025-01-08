@@ -51,7 +51,7 @@ class MCPClientManager:
             for client_tool in list_tools.tools:
                 if client_tool.name == tool:
                     return client
-                
+
     async def get_client_from_prompt(self, prompt: str):
         for name, client in self.get_clients():
             try:

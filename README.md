@@ -24,6 +24,8 @@ working features:
 
 - MCP tools
 
+- SSE Bridge for external clients
+
 planned features:
 
 - streaming completions are not implemented yet
@@ -53,6 +55,11 @@ environment:
   - MCP_BRIDGE__CONFIG__FILE=config.json # mount the config file for this to work
   - MCP_BRIDGE__CONFIG__HTTP_URL=http://10.88.100.170:8888/config.json
   - MCP_BRIDGE__CONFIG__JSON={"inference_server":{"base_url":"http://example.com/v1","api_key":"None"},"mcp_servers":{"fetch":{"command":"uvx","args":["mcp-server-fetch"]}}}
+```
+The mount point for using the config file would look like:
+```yaml
+    volumes:
+      - ./config.json:/mcp_bridge/config.json
 ```
 
 3. **run the service**
@@ -91,13 +98,18 @@ Here is an example config.json file:
 
 4. **Run the application:**
 ```bash
-uv run python mcp_bridge/main.py
+uv run mcp_bridge/main.py
 ```
 
 ## Usage
 Once the application is running, you can interact with it using the OpenAI API.
 
 View the documentation at [http://yourserver:8000/docs](http://localhost:8000/docs). There is an endpoint to list all the MCP tools available on the server, which you can use to test the application configuration.
+
+## SSE Bridge
+MCP-Bridge also provides an SSE bridge for external clients. This lets external chat apps with explicit MCP support use MCP-Bridge as a MCP server. Point your client at the SSE endpoint (http://yourserver:8000/mcp-server/sse) and you should be able to see all the MCP tools available on the server.
+
+This also makes it easy to test if your configuration is working correctly. You can use [wong2/mcp-cli](https://github.com/wong2/mcp-cli?tab=readme-ov-file#connect-to-a-running-server-over-sse) to test your configuration. `npx @wong2/mcp-cli --sse http://localhost:8000/mcp-server/sse`
 
 ## Configuration
 

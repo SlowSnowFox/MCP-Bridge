@@ -5,6 +5,7 @@ from mcp_clients.McpClientManager import ClientManager
 
 router = APIRouter(prefix="/servers")
 
+
 @router.get("/{server_name}/prompts")
 async def get_server_prompts(server_name: str) -> ListPromptsResult:
     """Get all prompts from a specific MCP server"""
@@ -12,8 +13,9 @@ async def get_server_prompts(server_name: str) -> ListPromptsResult:
     client = ClientManager.get_client(server_name)
     if not client:
         raise HTTPException(status_code=404, detail=f"Server '{server_name}' not found")
-    
+
     return await client.list_prompts()
+
 
 @router.get("/{server_name}/tools")
 async def get_server_tools(server_name: str) -> ListToolsResult:
@@ -22,8 +24,9 @@ async def get_server_tools(server_name: str) -> ListToolsResult:
     client = ClientManager.get_client(server_name)
     if not client:
         raise HTTPException(status_code=404, detail=f"Server '{server_name}' not found")
-    
+
     return await client.list_tools()
+
 
 @router.get("/{server_name}/resources")
 async def get_server_resources(server_name: str) -> ListResourcesResult:
@@ -32,8 +35,9 @@ async def get_server_resources(server_name: str) -> ListResourcesResult:
     client = ClientManager.get_client(server_name)
     if not client:
         raise HTTPException(status_code=404, detail=f"Server '{server_name}' not found")
-    
+
     return await client.list_resources()
+
 
 @router.get("/{server_name}/status")
 async def get_server_status(server_name: str) -> McpServerStatus:
@@ -42,5 +46,5 @@ async def get_server_status(server_name: str) -> McpServerStatus:
     client = ClientManager.get_client(server_name)
     if not client:
         raise HTTPException(status_code=404, detail=f"Server '{server_name}' not found")
-    
+
     return await client.status()

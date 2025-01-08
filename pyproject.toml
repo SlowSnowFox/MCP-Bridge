@@ -20,3 +20,9 @@ dependencies = [
 
 [tool.uv.sources]
 lmos-openai-types = { git = "https://github.com/LMOS-IO/LMOS-openai-types", rev = "pydantic-gen" }
+
+[dependency-groups]
+dev = [
+    "mypy>=1.14.0",
+    "ruff>=0.8.4",
+]

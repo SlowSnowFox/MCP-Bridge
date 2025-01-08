@@ -25,7 +25,7 @@ async def chat_completions(
         text = (
             await client.post(
                 "/chat/completions",
-                json=request.model_dump(
+                content=request.model_dump_json(
                     exclude_defaults=True, exclude_none=True, exclude_unset=True
                 ),
             )

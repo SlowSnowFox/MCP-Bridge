@@ -4,6 +4,7 @@ from mcp.types import ListResourcesResult
 
 router = APIRouter(prefix="/resources")
 
+
 @router.get("")
 async def get_resources() -> dict[str, ListResourcesResult]:
     """Get all resources from all MCP clients"""

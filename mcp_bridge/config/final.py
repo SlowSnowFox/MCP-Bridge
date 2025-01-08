@@ -6,7 +6,10 @@ from mcp.client.stdio import StdioServerParameters
 
 
 class InferenceServer(BaseModel):
-    base_url: str = Field(description="Base URL of the inference server")
+    base_url: str = Field(
+        default="http://localhost:11434/v1",
+        description="Base URL of the inference server",
+    )
     api_key: str = Field(
         default="unauthenticated", description="API key for the inference server"
     )
@@ -35,6 +38,7 @@ class Network(BaseModel):
 
 class Settings(BaseSettings):
     inference_server: InferenceServer = Field(
+        default_factory=lambda: InferenceServer.model_construct(),
         description="Inference server configuration"
     )
 

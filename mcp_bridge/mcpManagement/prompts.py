@@ -5,6 +5,7 @@ from mcp.types import ListPromptsResult, GetPromptResult
 
 router = APIRouter(prefix="/prompts")
 
+
 @router.get("")
 async def get_prompts() -> dict[str, ListPromptsResult]:
     """Get all prompts from all MCP clients"""
@@ -16,6 +17,7 @@ async def get_prompts() -> dict[str, ListPromptsResult]:
 
     return prompts
 
+
 @router.post("/{prompt_name}")
 async def get_prompt(prompt_name: str, args: dict[str, str] = {}) -> GetPromptResult:
     """Evaluate a prompt"""
@@ -23,9 +25,9 @@ async def get_prompt(prompt_name: str, args: dict[str, str] = {}) -> GetPromptRe
     client = await ClientManager.get_client_from_prompt(prompt_name)
     if not client:
         raise HTTPException(status_code=404, detail=f"Prompt '{prompt_name}' not found")
-    
+
     result = await client.get_prompt(prompt_name, arguments=args)
     if not result:
         raise HTTPException(status_code=404, detail=f"Prompt '{prompt_name}' not found")
-    
+
     return result
