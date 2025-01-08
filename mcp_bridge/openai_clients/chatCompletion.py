@@ -33,7 +33,8 @@ async def chat_completions(
         logger.debug(text)
         try:
             response = CreateChatCompletionResponse.model_validate_json(text)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error validating response: {e} on {text}")
             return
 
         msg = response.choices[0].message
