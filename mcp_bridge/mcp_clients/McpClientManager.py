@@ -32,8 +32,7 @@ class MCPClientManager:
             return client
 
         if isinstance(server_config, SSEMCPServer):
-            # TODO: implement sse client
-            client = SseClient(name, server_config)  # type: ignore
+            client = SseClient(name, server_config)
             await client.start()
             return client
 
